@@ -59,18 +59,22 @@ fn plot_data(nrows:usize,ncols:usize,data:Vec<f64>){
 }
 
 fn data_to_color(data: &[f64]) -> Vec<u8> {
-    let max = data.iter().fold(f64::MIN, |a, &b| a.max(b));
-    let min = data.iter().fold(f64::MAX, |a, &b| a.min(b));
+    let valid_data: Vec<&f64> = data.iter().filter(|&&x| x != -99999.0).collect();
+    
+    let max = valid_data.iter().fold(f64::MIN, |a, &&b| a.max(b));
+    let min = valid_data.iter().fold(f64::MAX, |a, &&b| a.min(b));
     let range = max - min;
-    let color_map = colorgrad::preset::turbo(); // You can choose a different color map here
+    let color_map = colorgrad::preset::turbo(); // Choose a color map
     
     data.iter().flat_map(|&x| {
-        let normalized = ((x - min) / range) as f32;
-        let color = color_map.at(normalized);
-        
-        // Color values are in the range [0.0, 1.0], so scale them to [0, 255] and convert to u8
-        let [r, g, b,a] = color.to_rgba8();
-        vec![r,g,b] // Return RGB values
+        if x == -99999.0 {
+            vec![0, 0, 0] // Black for NoData
+        } else {
+            let normalized = ((x - min) / range) as f32;
+            let color = color_map.at(normalized);
+            let [r, g, b, _a] = color.to_rgba8();
+            vec![r, g, b]
+        }
     }).collect()
 }
 
@@ -97,20 +101,20 @@ fn add_shadow(data: &[f64],ncols:usize,nrows:usize,colors:&[u8])->Vec<u8>{
     combined
 }
 
-fn shadowing(data: &[f64],nrows:usize,ncols:usize,altitude: f64, azimuth: f64,cellsize:f64,z_factor:f64) -> Vec<f64>{
+fn shadowing(data: &[f64], nrows: usize, ncols: usize, altitude: f64, azimuth: f64, cellsize: f64, z_factor: f64) -> Vec<f64> {
     let mut hillshade = vec![0.0; nrows * ncols];
     let azimuth_rad = azimuth.to_radians();
     let altitude_rad = altitude.to_radians();
-    
+
     let zenith_rad = (90.0 - altitude).to_radians();
     let cos_zenith = zenith_rad.cos();
     let sin_zenith = zenith_rad.sin();
-    
-    for y in 1..nrows-1 {
-        for x in 1..ncols-1 {
+
+    for y in 1..nrows - 1 {
+        for x in 1..ncols - 1 {
             let idx = y * ncols + x;
-            
-            // Calculate slope and aspect using the 3x3 window
+
+            // Fetch surrounding pixel values
             let a = data[idx - ncols - 1];
             let b = data[idx - ncols];
             let c = data[idx - ncols + 1];
@@ -119,45 +123,61 @@ fn shadowing(data: &[f64],nrows:usize,ncols:usize,altitude: f64, azimuth: f64,ce
             let g = data[idx + ncols - 1];
             let h = data[idx + ncols];
             let i = data[idx + ncols + 1];
-            
-            let dz_dx = ((c + 2.0 * f + i) - (a + 2.0 * d + g)) / (8.0 * cellsize);
-            let dz_dy = ((g + 2.0 * h + i) - (a + 2.0 * b + c)) / (8.0 * cellsize);
-            
+
+            // Ignore nodata value (-99999)
+            if a == -99999.0 || b == -99999.0 || c == -99999.0 ||
+               d == -99999.0 || f == -99999.0 ||
+               g == -99999.0 || h == -99999.0 || i == -99999.0 {
+                hillshade[idx] = 0.0;
+                continue;
+            }
+
+            // Compute dz/dx and dz/dy
+            let dz_dx = ((c + 2.0 * f + i) - (a + 2.0 * d + g)) / (8.0 * cellsize * z_factor);
+            let dz_dy = ((g + 2.0 * h + i) - (a + 2.0 * b + c)) / (8.0 * cellsize * z_factor);
+
+            // Compute slope
             let slope_rad = (dz_dx.powi(2) + dz_dy.powi(2)).sqrt().atan();
+
+            // Compute aspect
             let aspect_rad = if dz_dx != 0.0 {
-                let aspect = dz_dy.atan2(-dz_dx);
-                if aspect < 0.0 { aspect + 2.0 * std::f64::consts::PI } else { aspect }
+                let mut aspect = dz_dy.atan2(-dz_dx);
+                if aspect < 0.0 {
+                    aspect += 2.0 * std::f64::consts::PI;
+                }
+                aspect
+            } else if dz_dy > 0.0 {
+                std::f64::consts::PI / 2.0
+            } else if dz_dy < 0.0 {
+                3.0 * std::f64::consts::PI / 2.0
             } else {
-                if dz_dy > 0.0 { std::f64::consts::PI / 2.0 }
-                else if dz_dy < 0.0 { 3.0 * std::f64::consts::PI / 2.0 }
-                else { 0.0 }
+                0.0
             };
-            
-            // Calculate hillshade value
-            let hillshade_value = (cos_zenith * slope_rad.cos() + 
-                                  sin_zenith * slope_rad.sin() * 
-                                  (azimuth_rad - aspect_rad).cos())
-                .max(0.0);
-            
+
+            // Compute hillshade
+            let hillshade_value = (cos_zenith * slope_rad.cos() + sin_zenith * slope_rad.sin() * (azimuth_rad - aspect_rad).cos())
+             .clamp(0.0, 1.0);
+
             hillshade[idx] = hillshade_value;
         }
     }
-    
-    // Handle edge cases by copying neighboring values
+
+    // Handle border pixels by copying values from neighbors
     for y in 0..nrows {
         for x in 0..ncols {
-            if y == 0 || y == nrows-1 || x == 0 || x == ncols-1 {
-                let ny = if y == 0 { 1 } else if y == nrows-1 { nrows-2 } else { y };
-                let nx = if x == 0 { 1 } else if x == ncols-1 { ncols-2 } else { x };
+            if y == 0 || y == nrows - 1 || x == 0 || x == ncols - 1 {
+                let ny = if y == 0 { 1 } else if y == nrows - 1 { nrows - 2 } else { y };
+                let nx = if x == 0 { 1 } else if x == ncols - 1 { ncols - 2 } else { x };
                 hillshade[y * ncols + x] = hillshade[ny * ncols + nx];
             }
         }
     }
-    
+
     hillshade
-    }
+}
+
 fn main() {
-    let file_path = "0925_6225/LITTO3D_FRA_0929_6224_20150529_LAMB93_RGF93_IGN69/MNT1m/LITTO3D_FRA_0929_6224_MNT_20150128_LAMB93_RGF93_IGN69.asc";
+    let file_path = "/home/mahmoud/DEM_Rust/0925_6225/LITTO3D_FRA_0925_6225_20150529_LAMB93_RGF93_IGN69/MNT1m/LITTO3D_FRA_0925_6225_MNT_20150529_LAMB93_RGF93_IGN69.asc";
     let file_data =  read_file(file_path);
     let (ncols, nrows, data_vec) = get_data(file_data);
     plot_data(nrows, ncols, data_vec);
