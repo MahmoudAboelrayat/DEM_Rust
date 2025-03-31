@@ -1,0 +1,44 @@
+PRODUIT                         Litto3D
+VERSION                         1.1
+
+CHANTIER_RESUME
+ Le référentiel Litto3D a été réalisé par l'Institut national de l'information géographique et forestière(IGN)
+ et le Service hydrographique et océanographique de la Marine (SHOM) en partenariat avec la Communauté
+ d'agglomération Toulon Provence Méditerranée, le Ministère des Transports, de l'Equipement, du Tourisme
+ et de la Mer, et la Direction de la sécurité civile.
+
+CHANTIER_SYSGEOD                RGF93
+CHANTIER_SYSCOORD               LAMB93
+CHANTIER_SYSALTI                IGN69
+
+DALLE_NOMFIC                    LITTO3D_FRA_0927_6224_PTS_20150529_LAMB93_RGF93_IGN69.xyz
+DALLE_DATE                      19/05/2015
+DALLE_NBR_PT                    1032940
+DALLE_XMIN                      927000.00
+DALLE_XMAX                      927999.99
+DALLE_YMIN                      6223000.00
+DALLE_YMAX                      6223999.99
+DALLE_ZMIN                      -15.06
+DALLE_ZMAX                      20.77
+
+LIDAR_TOPO_ESPACEMENT           Voir spécifications techniques Litto3D
+LIDAR_TOPO_PRECIS_XY            Voir spécifications techniques Litto3D
+LIDAR_TOPO_PRECIS_Z             Voir spécifications techniques Litto3D
+LIDAR_TOPO_INSTRUMENT           ALTM31000AE-IGN
+LIDAR_TOPO_DEBUT                14/06/08
+LIDAR_TOPO_FIN                  15/06/08
+
+LIDAR_BATHY_ESPACEMENT          Voir spécifications techniques Litto3D
+LIDAR_BATHY_PRECIS_XY           Voir spécifications techniques Litto3D
+LIDAR_BATHY_PRECIS_Z            Voir spécifications techniques Litto3D
+LIDAR_BATHY_INSTRUMENT          HAWKEYE IIb
+LIDAR_BATHY_DEBUT               05/10/10
+LIDAR_BATHY_FIN                 07/10/10
+
+MNT_NOMFIC                      LITTO3D_FRA_0927_6224_MNT_20150529_LAMB93_RGF93_IGN69.asc
+MNT_PAS                         1.00
+MNT_DATE                        05/05/2015
+MNT_PRECIS_XY                   Voir spécifications techniques Litto3D
+MNT_PRECIS_Z                    Voir spécifications techniques Litto3D
+MNT_ZMIN                        -15.03
+MNT_ZMAX                        20.58

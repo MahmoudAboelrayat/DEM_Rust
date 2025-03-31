@@ -1,0 +1,360 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gmd:MD_Metadata xmlns:gco="http://www.isotc211.org/2005/gco" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:geonet="http://www.fao.org/geonetwork" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gts="http://www.isotc211.org/2005/gts" xmlns:gmx="http://www.isotc211.org/2005/gmx" xmlns:gml="http://www.opengis.net/gml" xmlns:gfc="http://www.isotc211.org/2005/gfc" xsi:schemaLocation="http://www.isotc211.org/2005/gmd http://www.isotc211.org/2005/gmd/gmd.xsd">
+  <gmd:fileIdentifier xmlns:srv="http://www.isotc211.org/2005/srv">
+    <gco:CharacterString>BATHYMETRIE_LITTO3D_PACA_2015_PREPAQUET_0925_6225.xml</gco:CharacterString>
+  </gmd:fileIdentifier>
+  <gmd:language>
+    <gmd:LanguageCode codeList="http://www.loc.gov/standards/iso639-2/" codeListValue="fre">fre</gmd:LanguageCode>
+  </gmd:language>
+  <gmd:characterSet>
+    <gmd:MD_CharacterSetCode codeListValue="utf8" codeList="./resources/codeList.xml#MD_CharacterSetCode"/>
+  </gmd:characterSet>
+  <gmd:parentIdentifier xmlns:srv="http://www.isotc211.org/2005/srv">
+    <gco:CharacterString>BATHYMETRIE_LITTO3D_PACA_2015.xml</gco:CharacterString>
+  </gmd:parentIdentifier>
+  <gmd:hierarchyLevel>
+    <gmd:MD_ScopeCode codeList="http://www.isotc211.org/2005/resources/codeList.xml#MD_ScopeCode" codeListValue="series"/>
+  </gmd:hierarchyLevel>
+  <gmd:hierarchyLevelName>
+    <gco:CharacterString>Prepaquet</gco:CharacterString>
+  </gmd:hierarchyLevelName>
+  <gmd:contact>
+    <gmd:CI_ResponsibleParty>
+      <gmd:organisationName>
+        <gco:CharacterString>SHOM</gco:CharacterString>
+      </gmd:organisationName>
+      <gmd:contactInfo>
+        <gmd:CI_Contact>
+          <gmd:address>
+            <gmd:CI_Address>
+              <gmd:electronicMailAddress>
+                <gco:CharacterString>bps@shom.fr</gco:CharacterString>
+              </gmd:electronicMailAddress>
+            </gmd:CI_Address>
+          </gmd:address>
+        </gmd:CI_Contact>
+      </gmd:contactInfo>
+      <gmd:role>
+        <gmd:CI_RoleCode codeListValue="pointOfContact" codeList="http://www.isotc211.org/2005/resources/codeList.xml#CI_RoleCode"/>
+      </gmd:role>
+    </gmd:CI_ResponsibleParty>
+  </gmd:contact>
+  <gmd:dateStamp>
+    <gco:DateTime xmlns:srv="http://www.isotc211.org/2005/srv">2012-06-06T10:58:13</gco:DateTime>
+  </gmd:dateStamp>
+  <gmd:metadataStandardName>
+    <gco:CharacterString>ISO 19115:2003/19139</gco:CharacterString>
+  </gmd:metadataStandardName>
+  <gmd:metadataStandardVersion>
+    <gco:CharacterString>1.0</gco:CharacterString>
+  </gmd:metadataStandardVersion>
+  <gmd:referenceSystemInfo>
+    <gmd:MD_ReferenceSystem>
+      <gmd:referenceSystemIdentifier>
+        <gmd:RS_Identifier>
+          <gmd:code>
+            <gco:CharacterString>RGF93 / Lambert-93 (EPSG:2154)</gco:CharacterString>
+          </gmd:code>
+          <gmd:codeSpace>
+            <gco:CharacterString>EPSG</gco:CharacterString>
+          </gmd:codeSpace>
+          <gmd:version>
+            <gco:CharacterString>7.4</gco:CharacterString>
+          </gmd:version>
+        </gmd:RS_Identifier>
+      </gmd:referenceSystemIdentifier>
+    </gmd:MD_ReferenceSystem>
+  </gmd:referenceSystemInfo>
+  <gmd:identificationInfo>
+    <gmd:MD_DataIdentification>
+      <gmd:citation>
+        <gmd:CI_Citation>
+          <gmd:title>
+            <gco:CharacterString>LITTO3D® PACA 2015 PREPAQUET 0925_6225</gco:CharacterString>
+          </gmd:title>
+          <gmd:date>
+            <gmd:CI_Date>
+              <gmd:date>
+                <gco:DateTime>2015-05-29</gco:DateTime>
+              </gmd:date>
+              <gmd:dateType>
+                <gmd:CI_DateTypeCode codeListValue="creation" codeList="http://www.isotc211.org/2005/resources/codeList.xml#CI_DateTypeCode"/>
+              </gmd:dateType>
+            </gmd:CI_Date>
+          </gmd:date>
+          <gmd:identifier>
+            <gmd:MD_Identifier>
+              <gmd:code>
+                <gco:CharacterString>http://shom.fr/BATHYMETRIE/L3D/LITTO3D_PACA_2015_PREPAQUET_0925_6225</gco:CharacterString>
+              </gmd:code>
+            </gmd:MD_Identifier>
+          </gmd:identifier>
+          <gmd:presentationForm>
+            <gmd:CI_PresentationFormCode codeListValue="mapDigital" codeList="http://www.isotc211.org/2005/resources/codeList.xml#CI_PresentationFormCode"/>
+          </gmd:presentationForm>
+        </gmd:CI_Citation>
+      </gmd:citation>
+      <gmd:abstract>
+        <gco:CharacterString>Litto3D Partie maritime est un produit intermédiaire du produit Litto3D ne contenant que les données maritimes. Le produit Litto3D est une base de données altimétrique unique et continue terre-mer donnant une représentation tridimensionnelle de la forme et de la position du sol sur la frange littorale du territoire français. Une ligne de partage des zones d'acquisition entre terre et mer, sépare les levés réalisés par les technologies lidar bathymétriques ou sondeur multifaisceau côté mer et lidar topographiques aéroportés côté terre, un recouvrement de 300m étant prévu. Litto3D Partie maritime est disponible sous deux formes : un semis de points tridimensionnels et un modèle numérique de terrain maillé et qualifié.</gco:CharacterString>
+      </gmd:abstract>
+      <gmd:purpose>
+        <gco:CharacterString>L’objectif principal est la production de données numériques décrivant avec une précision et une résolution inégalées (précision décimétrique, résolution métrique) les reliefs de l’ensemble de la zone. Ce référentiel constitue le socle de données nécessaire à la mise en œuvre de nombreuses applications et politiques publiques, telles que :
+•	La prévention des risques (tsunamis, houles cycloniques, élévation des eaux due au réchauffement climatique, submersions marines, inondations, érosion…),
+•	Les études d’aménagement littoral (routes, ports, …),
+•	l’amélioration de la connaissance du domaine public maritime, le suivi du trait de côte,
+•	la cartographie des habitats terrestres et marins,
+•	la création de modèles courantologiques et les applications liées (énergie des courants marins et de la houle, dispersion des rejets en mer, mouvements sédimentaires, …)
+•	la gestion intégrée des zones côtières (GIZC).</gco:CharacterString>
+      </gmd:purpose>
+      <gmd:credit>
+        <gco:CharacterString>Cette opération, pilotée par le Service hydrographique et océanographique de la marine (SHOM) et l’Institut national de l’information géographique et forestière (IGN), a été réalisée en partenariat avec la Région Provence-Alpes-Côte d'Azur, la Préfecture de la région PACA, la Communauté d'agglomération de Toulon Provence Méditerranée, et le Service d'infrastructure de la défense (SID). 
+			Litto3D® en région PACA est cofinancé par l'Union européenne. L'Europe s'engage en Provence-Alpes-Côte d'Azur avec le FEDER.</gco:CharacterString>
+      </gmd:credit>
+      <gmd:status>
+        <gmd:MD_ProgressCode codeListValue="onGoing" codeList="http://www.isotc211.org/2005/resources/codeList.xml#MD_ProgressCode"/>
+      </gmd:status>
+      <gmd:pointOfContact>
+        <gmd:CI_ResponsibleParty>
+          <gmd:organisationName>
+            <gco:CharacterString>SHOM</gco:CharacterString>
+          </gmd:organisationName>
+          <gmd:contactInfo>
+            <gmd:CI_Contact>
+              <gmd:address>
+                <gmd:CI_Address>
+                  <gmd:electronicMailAddress>
+                    <gco:CharacterString>bps@shom.fr</gco:CharacterString>
+                  </gmd:electronicMailAddress>
+                </gmd:CI_Address>
+              </gmd:address>
+            </gmd:CI_Contact>
+          </gmd:contactInfo>
+          <gmd:role>
+            <gmd:CI_RoleCode codeList="http://www.isotc211.org/2005/resources/codeList.xml#CI_RoleCode" codeListValue="pointOfContact"/>
+          </gmd:role>
+        </gmd:CI_ResponsibleParty>
+      </gmd:pointOfContact>
+      <gmd:descriptiveKeywords>
+        <gmd:MD_Keywords>
+          <gmd:keyword>
+            <gco:CharacterString>Altitude</gco:CharacterString>
+          </gmd:keyword>
+          <gmd:type>
+            <gmd:MD_KeywordTypeCode codeList="http://www.isotc211.org/2005/resources/codeList.xml#MD_KeywordTypeCode" codeListValue="theme"/>
+          </gmd:type>
+          <gmd:thesaurusName>
+            <gmd:CI_Citation>
+              <gmd:title>
+                <gco:CharacterString>GEMET - INSPIRE themes, version 1.0</gco:CharacterString>
+              </gmd:title>
+              <gmd:date gco:nilReason="unknown"/>
+            </gmd:CI_Citation>
+          </gmd:thesaurusName>
+        </gmd:MD_Keywords>
+      </gmd:descriptiveKeywords>
+      <gmd:resourceConstraints>
+        <gmd:MD_LegalConstraints>
+          <gmd:useLimitation>
+            <gco:CharacterString>LITTO3D® est diffusée sous licence Opendata "Licence Ouverte" (version 1.0 d'octobre 2011), définie par la mission Etalab.</gco:CharacterString>
+          </gmd:useLimitation>
+          <gmd:accessConstraints>
+            <gmd:MD_RestrictionCode codeList="http://www.isotc211.org/2005/resources/codeList.xml#MD_RestrictionCode" codeListValue="license"/>
+          </gmd:accessConstraints>
+          <gmd:useConstraints>
+            <gmd:MD_RestrictionCode codeList="http://www.isotc211.org/2005/resources/codeList.xml#MD_RestrictionCode" codeListValue="otherRestrictions"/>
+          </gmd:useConstraints>
+          <gmd:otherConstraints>
+            <gco:CharacterString>Pas de restriction d'accès public.</gco:CharacterString>
+          </gmd:otherConstraints>
+        </gmd:MD_LegalConstraints>
+      </gmd:resourceConstraints>
+      <gmd:resourceConstraints>
+        <gmd:MD_SecurityConstraints>
+          <gmd:classification>
+            <gmd:MD_ClassificationCode codeList="http://www.isotc211.org/2005/resources/codeList.xml#MD_ClassificationCode" codeListValue="unclassified"/>
+          </gmd:classification>
+        </gmd:MD_SecurityConstraints>
+      </gmd:resourceConstraints>
+      <gmd:spatialRepresentationType>
+        <gmd:MD_SpatialRepresentationTypeCode codeListValue="grid" codeList="http://www.isotc211.org/2005/resources/codeList.xml#MD_SpatialRepresentationTypeCode"/>
+      </gmd:spatialRepresentationType>
+      <gmd:spatialResolution>
+        <gmd:MD_Resolution>
+          <gmd:distance>
+            <gco:Distance uom="m">1</gco:Distance>
+          </gmd:distance>
+        </gmd:MD_Resolution>
+      </gmd:spatialResolution>
+      <gmd:language>
+        <gmd:LanguageCode codeList="http://www.loc.gov/standards/iso639-2/" codeListValue="fre">fre</gmd:LanguageCode>
+      </gmd:language>
+      <gmd:characterSet>
+        <gmd:MD_CharacterSetCode codeListValue="utf8" codeList="http://www.isotc211.org/2005/resources/codeList.xml#MD_CharacterSetCode"/>
+      </gmd:characterSet>
+      <gmd:topicCategory>
+        <gmd:MD_TopicCategoryCode>elevation</gmd:MD_TopicCategoryCode>
+      </gmd:topicCategory>
+      <gmd:extent>
+        <gmd:EX_Extent>
+          <gmd:geographicElement>
+            <gmd:EX_GeographicBoundingBox>
+              <gmd:westBoundLongitude>
+                <gco:Decimal>5.7595388793</gco:Decimal>
+              </gmd:westBoundLongitude>
+              <gmd:eastBoundLongitude>
+                <gco:Decimal>5.8230017725</gco:Decimal>
+              </gmd:eastBoundLongitude>
+              <gmd:southBoundLatitude>
+                <gco:Decimal>43.0423389057</gco:Decimal>
+              </gmd:southBoundLatitude>
+              <gmd:northBoundLatitude>
+                <gco:Decimal>43.088869905</gco:Decimal>
+              </gmd:northBoundLatitude>
+            </gmd:EX_GeographicBoundingBox>
+          </gmd:geographicElement>
+        </gmd:EX_Extent>
+      </gmd:extent>
+    </gmd:MD_DataIdentification>
+  </gmd:identificationInfo>
+  <gmd:distributionInfo>
+    <gmd:MD_Distribution>
+      <gmd:distributionFormat>
+        <gmd:MD_Format>
+          <gmd:name>
+            <gco:CharacterString>ASC</gco:CharacterString>
+          </gmd:name>
+          <gmd:version>
+            <gco:CharacterString>-</gco:CharacterString>
+          </gmd:version>
+        </gmd:MD_Format>
+      </gmd:distributionFormat>
+      <gmd:distributionFormat>
+        <gmd:MD_Format>
+          <gmd:name>
+            <gco:CharacterString>XYZ</gco:CharacterString>
+          </gmd:name>
+          <gmd:version>
+            <gco:CharacterString>-</gco:CharacterString>
+          </gmd:version>
+        </gmd:MD_Format>
+      </gmd:distributionFormat>
+      <gmd:distributionFormat>
+        <gmd:MD_Format>
+          <gmd:name>
+            <gco:CharacterString>7z</gco:CharacterString>
+          </gmd:name>
+          <gmd:version>
+            <gco:CharacterString>9.20</gco:CharacterString>
+          </gmd:version>
+        </gmd:MD_Format>
+      </gmd:distributionFormat>
+      <gmd:distributor>
+        <gmd:MD_Distributor>
+          <gmd:distributorContact>
+            <gmd:CI_ResponsibleParty>
+              <gmd:organisationName>
+                <gco:CharacterString>SHOM</gco:CharacterString>
+              </gmd:organisationName>
+              <gmd:contactInfo>
+                <gmd:CI_Contact>
+                  <gmd:address>
+                    <gmd:CI_Address>
+                      <gmd:electronicMailAddress>
+                        <gco:CharacterString>bps@shom.fr</gco:CharacterString>
+                      </gmd:electronicMailAddress>
+                    </gmd:CI_Address>
+                  </gmd:address>
+                </gmd:CI_Contact>
+              </gmd:contactInfo>
+              <gmd:role>
+                <gmd:CI_RoleCode codeList="http://www.isotc211.org/2005/resources/codeList.xml#CI_RoleCode" codeListValue="pointOfContact"/>
+              </gmd:role>
+            </gmd:CI_ResponsibleParty>
+          </gmd:distributorContact>
+        </gmd:MD_Distributor>
+      </gmd:distributor>
+      <gmd:transferOptions>
+        <gmd:MD_DigitalTransferOptions>
+          <gmd:onLine>
+            <gmd:CI_OnlineResource>
+              <gmd:linkage>
+                <gmd:URL>http://data.shom.fr</gmd:URL>
+              </gmd:linkage>
+              <gmd:protocol>
+                <gco:CharacterString>WWW:LINK-1.0-http--link</gco:CharacterString>
+              </gmd:protocol>
+              <gmd:name>
+                <gco:CharacterString>Portail d'information géographique du SHOM</gco:CharacterString>
+              </gmd:name>
+            </gmd:CI_OnlineResource>
+          </gmd:onLine>
+          <gmd:onLine>
+            <gmd:CI_OnlineResource>
+              <gmd:linkage>
+                <gmd:URL>http://diffusion.shom.fr</gmd:URL>
+              </gmd:linkage>
+              <gmd:protocol>
+                <gco:CharacterString>WWW:LINK-1.0-http--link</gco:CharacterString>
+              </gmd:protocol>
+              <gmd:name>
+                <gco:CharacterString>Espace de diffusion du SHOM</gco:CharacterString>
+              </gmd:name>
+            </gmd:CI_OnlineResource>
+          </gmd:onLine>
+        </gmd:MD_DigitalTransferOptions>
+      </gmd:transferOptions>
+      <gmd:transferOptions>
+        <gmd:MD_DigitalTransferOptions>
+          <gmd:onLine>
+            <gmd:CI_OnlineResource>
+              <gmd:linkage>
+                <gmd:URL>http://services.data.shom.fr/telechargement</gmd:URL>
+              </gmd:linkage>
+              <gmd:name>
+                <gco:CharacterString>0925_6225</gco:CharacterString>
+              </gmd:name>
+            </gmd:CI_OnlineResource>
+          </gmd:onLine>
+        </gmd:MD_DigitalTransferOptions>
+      </gmd:transferOptions>
+    </gmd:MD_Distribution>
+  </gmd:distributionInfo>
+  <gmd:dataQualityInfo>
+    <gmd:DQ_DataQuality>
+      <gmd:scope>
+        <gmd:DQ_Scope>
+          <gmd:level>
+            <gmd:MD_ScopeCode codeListValue="series" codeList="http://www.isotc211.org/2005/resources/codeList.xml#MD_ScopeCode"/>
+          </gmd:level>
+        </gmd:DQ_Scope>
+      </gmd:scope>
+      <gmd:lineage>
+        <gmd:LI_Lineage>
+          <gmd:statement>
+            <gco:CharacterString>Le MNT est accompagné de deux couches fournissant des métadonnées localisées. Chaque couche s’appuie sur la même grille régulière que le MNT, pour chaque nœud, l’une fournit une information sur l’origine des données majoritaires ayant servi à calculer un nœud et l’autre donne une information sur l’évaluation de la distance entre le nœud considéré et les différents points connus servant à calculer son altitude.
+Les données bathymétriques et topographiques proviennent de différents capteurs : Shoals 3000, HawkEye IIb et LADS MkIII.Les données topographiques et bathymétriques (capteur mixte) dans les très petits fonds (typiquement jusqu'à 2-3 mètres de profondeur, localement plus) proviennent d’un capteur RIEGL VQ-820-G.
+Les données topographiques proviennent d'un capteur ALTM31000AE-IGN.
+Ces données bathymétriques et topographiques ont été acquises entre le 30 septembre et le 2 octobre 2007, entre le 5 et le 7 octobre 2010 et entre le 30 avril 2012 et le 12 juillet 2013.</gco:CharacterString>
+          </gmd:statement>
+        </gmd:LI_Lineage>
+      </gmd:lineage>
+    </gmd:DQ_DataQuality>
+  </gmd:dataQualityInfo>
+  <gmd:metadataConstraints>
+    <gmd:MD_SecurityConstraints>
+      <gmd:useLimitation>
+        <gco:CharacterString>Aucune contrainte</gco:CharacterString>
+      </gmd:useLimitation>
+      <gmd:classification>
+        <gmd:MD_ClassificationCode codeList="http://www.isotc211.org/2005/resources/codeList.xml#MD_ClassificationCode" codeListValue="unclassified"/>
+      </gmd:classification>
+    </gmd:MD_SecurityConstraints>
+  </gmd:metadataConstraints>
+  <gmd:metadataConstraints>
+    <gmd:MD_Constraints>
+      <gmd:useLimitation>
+        <gco:CharacterString>Métadonnées publiques</gco:CharacterString>
+      </gmd:useLimitation>
+    </gmd:MD_Constraints>
+  </gmd:metadataConstraints>
+</gmd:MD_Metadata>
