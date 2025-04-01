@@ -106,7 +106,7 @@ fn hill_shading(data: &Vec<f32>, colored_image:RgbaImage, width: u32, height: u3
             let z2 = data[idx(0, -1)];
             let z3 = data[idx(1, -1)];
             let z4 = data[idx(-1, 0)];
-            let z5 = data[idx(0, 0)];  // Center pixel
+            // let z5 = data[idx(0, 0)];  // Center pixel
             let z6 = data[idx(1, 0)];
             let z7 = data[idx(-1, 1)];
             let z8 = data[idx(0, 1)];
@@ -191,36 +191,188 @@ print!("Hillshade image saved as hillshade_rgb.png\n");
 
 }
 
-
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::fs::File;
-    use std::io::{BufReader, BufRead};
+    use std::fs;
+    // use std::io::{BufReader, BufRead};
+
+    fn create_dummy_asc_file(content: &str) -> String {
+        let temp_dir = std::env::temp_dir();
+        let file_path = temp_dir.join("dummy.asc");
+        fs::write(&file_path, content).expect("Failed to write dummy ASC file");
+        file_path.to_str().unwrap().to_string()
+    }
 
     #[test]
-    fn test_asc_to_image() {
-        let file_path = "/home/anas/Downloads/0925_6225/LITTO3D_FRA_0929_6224_20150529_LAMB93_RGF93_IGN69/MNT1m/LITTO3D_FRA_0929_6224_MNT_20150128_LAMB93_RGF93_IGN69.asc";
-        let file = File::open(file_path).unwrap();
-        let reader = BufReader::new(file);
-        let content: String = reader.lines().filter_map(Result::ok).collect::<Vec<_>>().join("\n");
-        let (data_elevation, width, height) = asc_to_image(content).expect("Failed to read ASC file");
-        assert_eq!(width, 1000);
-        assert_eq!(height, 1000);
-        assert_eq!(data_elevation.len(), (width * height) as usize);
+    fn test_read_file_success() {
+        let content = "This is a test file.";
+        let file_path = create_dummy_asc_file(content);
+        let result = read_file(&file_path);
+        assert_eq!(result, content);
+        fs::remove_file(&file_path).unwrap();
     }
-}
-#[cfg(test)]
-//  test the data_to_grayscale function
-mod grayscale {
-    use super::*;
+
     #[test]
-    fn test_data_to_grayscale() {
-        let data = vec![0.0, 0.5, 1.0, 1.5, 2.0];
-        let width = 5;
+    fn test_asc_to_image_valid() {
+        let content = "ncols 5\nnrows 2\nxllcorner 0\nyllcorner 0\ncellsize 1\nnodata_value -9999\n1 2 3 4 5\n6 7 8 9 10\n";
+        let result = asc_to_image(content.to_string());
+        assert!(result.is_ok());
+        let (data, width, height) = result.unwrap();
+        assert_eq!(width, 5);
+        assert_eq!(height, 2);
+        assert_eq!(data.len(), 10);
+        assert_eq!(data, vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0]);
+    }
+
+    #[test]
+    fn test_asc_to_image_with_nodata() {
+        let content = "ncols 3\nnrows 2\nxllcorner 0\nyllcorner 0\ncellsize 1\nnodata_value -9999\n1 2 -9999\n-9999 5 6\n";
+        let result = asc_to_image(content.to_string());
+        assert!(result.is_ok());
+        let (data, width, height) = result.unwrap();
+        assert_eq!(width, 3);
+        assert_eq!(height, 2);
+        assert_eq!(data.len(), 6);
+        assert!(data[2].is_nan());
+        assert!(data[3].is_nan());
+        assert_eq!(data[0], 1.0);
+        assert_eq!(data[1], 2.0);
+        assert_eq!(data[4], 5.0);
+        assert_eq!(data[5], 6.0);
+    }
+
+    #[test]
+    fn test_asc_to_image_invalid_header() {
+        let content = "ncols abc\nnrows 2\nxllcorner 0\nyllcorner 0\ncellsize 1\nnodata_value -9999\n1 2 3\n4 5 6\n";
+        let result = asc_to_image(content.to_string());
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_data_to_grayscale_basic() {
+        let data = vec![0.0, 1.0, 2.0];
+        let width = 3;
         let height = 1;
-        let image = data_to_grayscale(data.clone(), width, height);
+        let image = data_to_grayscale(data, width, height);
         assert_eq!(image.width(), width);
         assert_eq!(image.height(), height);
+        assert_eq!(image.get_pixel(0, 0), &Luma([0]));
+        assert_eq!(image.get_pixel(1, 0), &Luma([127])); // Roughly
+        assert_eq!(image.get_pixel(2, 0), &Luma([255]));
+    }
+
+    #[test]
+    fn test_data_to_grayscale_with_nan() {
+        let data = vec![0.0, f32::NAN, 2.0];
+        let width = 3;
+        let height = 1;
+        let image = data_to_grayscale(data, width, height);
+        assert_eq!(image.width(), width);
+        assert_eq!(image.height(), height);
+        assert_eq!(image.get_pixel(0, 0), &Luma([0]));
+        assert_eq!(image.get_pixel(1, 0), &Luma([0])); // NaN should result in min value
+        assert_eq!(image.get_pixel(2, 0), &Luma([255]));
+    }
+
+    #[test]
+    fn test_data_to_grayscale_constant_value() {
+        let data = vec![5.0, 5.0, 5.0];
+        let width = 3;
+        let height = 1;
+        let image = data_to_grayscale(data, width, height);
+        assert_eq!(image.width(), width);
+        assert_eq!(image.height(), height);
+        assert_eq!(image.get_pixel(0, 0), &Luma([0]));
+        assert_eq!(image.get_pixel(1, 0), &Luma([0]));
+        assert_eq!(image.get_pixel(2, 0), &Luma([0]));
+    }
+
+    #[test]
+    fn test_rgb_basic() {
+        let data = vec![0.0, 1.0, 2.0];
+        let width = 3;
+        let height = 1;
+        let image = rgb(data, width, height);
+        assert_eq!(image.width(), width);
+        assert_eq!(image.height(), height);
+        // It's harder to assert exact RGB values due to the gradient,
+        // but we can check the dimensions.
+    }
+
+    #[test]
+    fn test_rgb_with_nan() {
+        let data = vec![0.0, f32::NAN, 2.0];
+        let width = 3;
+        let height = 1;
+        let image = rgb(data, width, height);
+        assert_eq!(image.width(), width);
+        assert_eq!(image.height(), height);
+        // We can't easily assert the color of the NaN pixel, but the image should be created.
+    }
+
+    #[test]
+    fn test_hill_shading_basic() {
+        let data = vec![
+            1.0, 1.0, 1.0,
+            1.0, 2.0, 1.0,
+            1.0, 1.0, 1.0,
+        ];
+        let width = 3;
+        let height = 3;
+        let colored_image = RgbaImage::new(width, height); // Dummy colored image
+        let (shaded_gray, shaded_rgb) = hill_shading(&data, colored_image, width, height, 315.0, 45.0);
+        assert_eq!(shaded_gray.width(), width);
+        assert_eq!(shaded_gray.height(), height);
+        assert_eq!(shaded_rgb.width(), width);
+        assert_eq!(shaded_rgb.height(), height);
+        // It's difficult to assert exact pixel values for hillshading
+        // due to the nature of the algorithm. We can at least check dimensions.
+    }
+
+    #[test]
+    fn test_hill_shading_with_nan() {
+        let data = vec![
+            1.0, 1.0, 1.0,
+            1.0, f32::NAN, 1.0,
+            1.0, 1.0, 1.0,
+        ];
+        let width = 3;
+        let height = 3;
+        let colored_image = RgbaImage::new(width, height); // Dummy colored image
+        let (shaded_gray, shaded_rgb) = hill_shading(&data, colored_image, width, height, 315.0, 45.0);
+        assert_eq!(shaded_gray.width(), width);
+        assert_eq!(shaded_gray.height(), height);
+        assert_eq!(shaded_rgb.width(), width);
+        assert_eq!(shaded_rgb.height(), height);
+        // Check if the center pixel (affected by NaN neighbor) is black
+        // assert_eq!(shaded_gray.get_pixel(1, 1), &Luma([0]));
+        assert_eq!(shaded_rgb.get_pixel(1, 1), &Rgba([0, 0, 0, 255]));
+    }
+
+    #[test]
+    fn test_hill_shading_edge_cases() {
+        let data = vec![
+            1.0, 2.0,
+            3.0, 4.0,
+        ];
+        let width = 2;
+        let height = 2;
+        let colored_image = RgbaImage::new(width, height);
+        let (shaded_gray, shaded_rgb) = hill_shading(&data, colored_image, width, height, 315.0, 45.0);
+        assert_eq!(shaded_gray.width(), width);
+        assert_eq!(shaded_gray.height(), height);
+        assert_eq!(shaded_rgb.width(), width);
+        assert_eq!(shaded_rgb.height(), height);
+        // Due to the 1-pixel border handling, the output for a 2x2 image might have a 2x2 black image.
+        // We can check if the corner pixels are 0.
+        assert_eq!(shaded_gray.get_pixel(0, 0), &Luma([0]));
+        assert_eq!(shaded_gray.get_pixel(1, 0), &Luma([0]));
+        assert_eq!(shaded_gray.get_pixel(0, 1), &Luma([0]));
+        assert_eq!(shaded_gray.get_pixel(1, 1), &Luma([0]));
+        assert_eq!(shaded_rgb.get_pixel(1, 0), &Rgba([0, 0, 0, 0]));
+        assert_eq!(shaded_rgb.get_pixel(0, 0), &Rgba([0, 0, 0, 0]));
+        assert_eq!(shaded_rgb.get_pixel(0, 1), &Rgba([0, 0, 0, 0]));
+        assert_eq!(shaded_rgb.get_pixel(1, 1), &Rgba([0, 0, 0, 0]));
     }
 }
