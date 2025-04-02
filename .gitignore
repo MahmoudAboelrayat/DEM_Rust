@@ -1,4 +1,5 @@
 /target
 dem/src/output_img/previous_img
 /Cargo.lock
-0925_6225/
+0925_6225/src/output_img/*.png
+src/output_img/previous_img/*.png
