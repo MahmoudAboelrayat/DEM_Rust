@@ -315,7 +315,7 @@ fn main() {
     draw_vector_field(&mut grad_img, &gradients, width, height);
     
     DynamicImage::ImageRgba8(grad_img)
-    .save(format!("{}/hillshade_grasssd_img_{}.png",output_path, timestamp))
+    .save(format!("{}/hillshade_rgb_gradient_{}.png",output_path, timestamp))
     .expect("Failed to save image");
     print!("Hillshade image saved as hillshade_grad_img.png\n");
 
