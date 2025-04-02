@@ -9,6 +9,12 @@ use imageproc::drawing::draw_line_segment_mut;
 use std::f32::consts::PI;
 
 /// Reads the content of a file and returns it as a string.
+/// # Arguments
+/// * `file_path` - A string representing path to the file.
+///
+/// # Returns
+/// * A `String` containing the content of the file.
+///
 fn read_file(file_path: &str) -> String {
     // Read a file in the local file system
     let mut data_file = File::open(file_path).unwrap();
@@ -23,6 +29,9 @@ fn read_file(file_path: &str) -> String {
 
 
 /// Parses an ASC file content into elevation data, width, and height.
+/// Arguments
+/// * `content` - A string containing the content of the ASC file.
+/// Returns a tuple containing the elevation data as a vector of f32, width, height, and cell size.
 fn asc_to_image(content: String) -> Result<(Vec<f32>, u32, u32,f32), Box<dyn Error>> {
     let mut header_lines = 6;
     let mut width = 0;
@@ -59,6 +68,13 @@ fn asc_to_image(content: String) -> Result<(Vec<f32>, u32, u32,f32), Box<dyn Err
 }
 
 /// Converts elevation data into a grayscale image.
+/// # Arguments
+/// * `data_processed` - A vector of f32 representing the elevation data.
+/// * `width` - The width of the image.
+/// * `height` - The height of the image.
+/// # Returns
+/// * A `GrayImage` object representing the grayscale image.
+
 fn data_to_grayscale(data_processed: Vec<f32>, width: u32, height: u32) -> GrayImage {
     let mut image = GrayImage::new(width, height);
     let min_val = data_processed.iter().cloned().fold(f32::INFINITY, f32::min);
@@ -76,6 +92,16 @@ fn data_to_grayscale(data_processed: Vec<f32>, width: u32, height: u32) -> GrayI
 }
 
 /// Converts elevation data into an RGB image using a color gradient.
+/// # Arguments
+/// * `data_processed` - A vector of f32 representing the elevation data.
+/// * `width` - The width of the image. 
+/// * `height` - The height of the image.
+/// # Returns
+/// * A `RgbaImage` object representing the RGB image.
+/// The function uses a color gradient to map the elevation data to RGB colors.
+/// The gradient is generated using the `colorgrad` crate.
+/// The function normalizes the elevation data to the range [0, 1] and then maps it to RGB colors.
+/// The function uses the `turbo` gradient from the `colorgrad` crate.
 fn rgb(data_processed: Vec<f32>, width: u32, height: u32) -> RgbaImage {
     let mut image = RgbaImage::new(width, height);
     let min_val = data_processed.iter().cloned().fold(f32::INFINITY, f32::min);
@@ -95,9 +121,21 @@ fn rgb(data_processed: Vec<f32>, width: u32, height: u32) -> RgbaImage {
 }
 
 /// Generates hillshade images (grayscale and RGB) from elevation data.
+/// # Arguments
+/// * `data` - A vector of f32 representing the elevation data.
+/// * `colored_image` - A `RgbaImage` object representing the colored image.
+/// * `width` - The width of the image.
+/// * `height` - The height of the image.
+/// * `cellsize` - The size of each cell in the elevation data.
+/// * `azimuth` - The azimuth angle for the light source.       
+/// * `altitude` - The altitude angle for the light source.
+/// # Returns     
+/// * A tuple containing two images: the grayscale hillshade image and the RGB hillshade image.
+/// The function calculates the slope and aspect of the terrain using the hillshading algorithm introduced in:
+/// https://pro.arcgis.com/en/pro-app/latest/tool-reference/3d-analyst/how-hillshade-works.htm
 fn hill_shading(data: &Vec<f32>, colored_image:RgbaImage, width: u32, height: u32, cellsize: f32, azimuth: f32, altitude: f32) -> (GrayImage, RgbaImage) {
     let mut shaded_image = GrayImage::new(width, height);
-    let mut shaded_image_rgb = RgbaImage::new(width, height);
+    let mut shaded_image_rgb: image::ImageBuffer<Rgba<u8>, Vec<u8>> = RgbaImage::new(width, height);
     let radians = std::f32::consts::PI / 180.0;
     let azimuth_rad = azimuth * radians;
     let altitude_rad = altitude * radians;
@@ -220,6 +258,7 @@ fn compute_gradients(data: &Vec<f32>, width: u32, height: u32, window_size: u32)
 
 
 
+
 fn main() {
     let output_path = "src/output_img";
     let mut file_path = "/home/anas/Downloads/0925_6225/LITTO3D_FRA_0925_6225_20150529_LAMB93_RGF93_IGN69/MNT1m/LITTO3D_FRA_0925_6225_MNT_20150529_LAMB93_RGF93_IGN69.asc";
@@ -299,6 +338,10 @@ mod tests {
     }
 
     #[test]
+    /// Test the read_file function 
+    /// It creates a dummy ASC file and checks if the content is read correctly.
+    /// It also cleans up the dummy file after the test.
+
     fn test_read_file_success() {
         let content = "This is a test file.";
         let file_path = create_dummy_asc_file(content);
@@ -308,6 +351,7 @@ mod tests {
     }
 
     #[test]
+    /// Given a know data set, it checks if the asc_to_image function parses the data correctly.
     fn test_asc_to_image_valid() {
         let content = "ncols 5\nnrows 2\nxllcorner 0\nyllcorner 0\ncellsize 1\nnodata_value -9999\n1 2 3 4 5\n6 7 8 9 10\n";
         let result = asc_to_image(content.to_string());
@@ -320,6 +364,7 @@ mod tests {
     }
 
     #[test]
+    /// It checks that asc_to_image handle the nodata_value correctly.
     fn test_asc_to_image_with_nodata() {
         let content = "ncols 3\nnrows 2\nxllcorner 0\nyllcorner 0\ncellsize 1\nnodata_value -9999\n1 2 -9999\n-9999 5 6\n";
         let result = asc_to_image(content.to_string());
@@ -337,6 +382,7 @@ mod tests {
     }
 
     #[test]
+    /// It checks that the function returns an error when the header is invalid.
     fn test_asc_to_image_invalid_header() {
         let content = "ncols abc\nnrows 2\nxllcorner 0\nyllcorner 0\ncellsize 1\nnodata_value -9999\n1 2 3\n4 5 6\n";
         let result = asc_to_image(content.to_string());
@@ -344,6 +390,7 @@ mod tests {
     }
 
     #[test]
+    /// It checks if the fucntion data_to_grayscale maps the data correctly to grayscale.
     fn test_data_to_grayscale_basic() {
         let data = vec![0.0, 1.0, 2.0];
         let width = 3;
@@ -352,11 +399,13 @@ mod tests {
         assert_eq!(image.width(), width);
         assert_eq!(image.height(), height);
         assert_eq!(image.get_pixel(0, 0), &Luma([0]));
-        assert_eq!(image.get_pixel(1, 0), &Luma([127])); // Roughly
+        assert_eq!(image.get_pixel(1, 0), &Luma([127])); 
         assert_eq!(image.get_pixel(2, 0), &Luma([255]));
     }
 
     #[test]
+    /// It checks how the function data_to_grayscale handles NaN values.
+    /// It should map NaN values to the minimum value of the grayscale range.
     fn test_data_to_grayscale_with_nan() {
         let data = vec![0.0, f32::NAN, 2.0];
         let width = 3;
@@ -370,6 +419,7 @@ mod tests {
     }
 
     #[test]
+    /// It checks if the function data_to_grayscale handles constant values correctly.
     fn test_data_to_grayscale_constant_value() {
         let data = vec![5.0, 5.0, 5.0];
         let width = 3;
@@ -383,6 +433,7 @@ mod tests {
     }
 
     #[test]
+    /// It checks if the rgb function maps the data correctly to RGB image with width and height.
     fn test_rgb_basic() {
         let data = vec![0.0, 1.0, 2.0];
         let width = 3;
@@ -390,11 +441,11 @@ mod tests {
         let image = rgb(data, width, height);
         assert_eq!(image.width(), width);
         assert_eq!(image.height(), height);
-        // It's harder to assert exact RGB values due to the gradient,
-        // but we can check the dimensions.
+
     }
 
     #[test]
+    /// It checks if the rgb function handles NaN values correctly.
     fn test_rgb_with_nan() {
         let data = vec![0.0, f32::NAN, 2.0];
         let width = 3;
@@ -402,10 +453,10 @@ mod tests {
         let image = rgb(data, width, height);
         assert_eq!(image.width(), width);
         assert_eq!(image.height(), height);
-        // We can't easily assert the color of the NaN pixel, but the image should be created.
     }
 
     #[test]
+    /// It checks if the hill_shading maps the data correctly to gray scale and RGB image with width and height.
     fn test_hill_shading_basic() {
         let data = vec![
             1.0, 1.0, 1.0,
@@ -415,17 +466,17 @@ mod tests {
         let width = 3;
         let height = 3;
         let cellsize = 1.0;
-        let colored_image = RgbaImage::new(width, height); // Dummy colored image
+        let colored_image = RgbaImage::new(width, height);
         let (shaded_gray, shaded_rgb) = hill_shading(&data, colored_image, width, height, cellsize, 315.0, 45.0);
         assert_eq!(shaded_gray.width(), width);
         assert_eq!(shaded_gray.height(), height);
         assert_eq!(shaded_rgb.width(), width);
         assert_eq!(shaded_rgb.height(), height);
-        // It's difficult to assert exact pixel values for hillshading
-        // due to the nature of the algorithm. We can at least check dimensions.
+
     }
 
     #[test]
+    /// Checks if the hill_shading function handles NaN values correctly.
     fn test_hill_shading_with_nan() {
         let data = vec![
             1.0, 1.0, 1.0,
@@ -447,6 +498,7 @@ mod tests {
     }
 
     #[test]
+    /// It checks if the hill_shading function handles edge cases correctly.
     fn test_hill_shading_edge_cases() {
         let data = vec![
             1.0, 2.0,
@@ -461,8 +513,6 @@ mod tests {
         assert_eq!(shaded_gray.height(), height);
         assert_eq!(shaded_rgb.width(), width);
         assert_eq!(shaded_rgb.height(), height);
-        // Due to the 1-pixel border handling, the output for a 2x2 image might have a 2x2 black image.
-        // We can check if the corner pixels are 0.
         assert_eq!(shaded_gray.get_pixel(0, 0), &Luma([0]));
         assert_eq!(shaded_gray.get_pixel(1, 0), &Luma([0]));
         assert_eq!(shaded_gray.get_pixel(0, 1), &Luma([0]));
