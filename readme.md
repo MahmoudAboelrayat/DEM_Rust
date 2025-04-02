@@ -24,12 +24,12 @@ This Rust project processes elevation data from ASC files, converts it into gray
 ### RGB Hillshade Representation
 This image represents the **final hillshade RGB representation** using a color gradient.
 
-![RGB Hillshade](src/output_img/hillshade_grasssd_img_20250402_171225.png)
+![Gradient Field](src/output_img/hillshade_rgb_20250402_153924.png)
 
 ### Gradient Field Representation
 This image represents the **gradient field**, highlighting the highest and lowest elevation regions.
 
-![Gradient Field](src/output_img/hillshade_rgb_20250402_153924.png)
+![RGB Hillshade](src/output_img/hillshade_grasssd_img_20250402_171225.png)
 
 
 ## Dependencies
