@@ -30,16 +30,18 @@ This project relies on several Rust libraries:
    ```
 3. Build the project:
    ```sh
-   cargo build --release
+   cargo build 
    ```
 4. Download the dataset
 
 ## Usage
 Run the program by providing an ASC file path:
 ```sh
-cargo run --release -- path/to/elevation.asc
+cargo run -- path/to/elevation.asc
 ```
 If no path is provided, the program uses a default ASC file with the location as the variable file_path.
+
+**Note:** If you want to use the current code, you need to place the dataset in the specified folder.
 
 ## Output Files
 - `output_YYYYMMDD_HHMMSS.png` - Grayscale elevation image
@@ -48,5 +50,4 @@ If no path is provided, the program uses a default ASC file with the location as
 - `hillshade_rgb_YYYYMMDD_HHMMSS.png` - RGB hillshade
 
 All output images are saved in the `src/output_img` directory.
-
 
