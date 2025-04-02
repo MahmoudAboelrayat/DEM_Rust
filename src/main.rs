@@ -1,4 +1,4 @@
-use std::fs::File;
+use std::{fs::File};
 use std::error::Error;
 use colorgrad::{Gradient, preset};
 use image::{DynamicImage, Luma, Rgba, RgbaImage, GrayImage};
@@ -21,12 +21,13 @@ fn read_file(file_path: &str) -> String {
 
 
 /// Parses an ASC file content into elevation data, width, and height.
-fn asc_to_image(content: String) -> Result<(Vec<f32>, u32, u32), Box<dyn Error>> {
+fn asc_to_image(content: String) -> Result<(Vec<f32>, u32, u32,f32), Box<dyn Error>> {
     let mut header_lines = 6;
     let mut width = 0;
     let mut height = 0;
     let mut data_elevation = Vec::new();
     let mut nodata_value =f32::NAN;
+    let mut cell_size = 1.0;
 
     let mut reader = content.lines();
     while let Some(line) = reader.next() {
@@ -37,6 +38,7 @@ fn asc_to_image(content: String) -> Result<(Vec<f32>, u32, u32), Box<dyn Error>>
                 ["ncols", ncols] => width = ncols.parse::<u32>()?,                
                 ["nrows", nrows] => height = nrows.parse::<u32>()?,
                 ["nodata_value", nodata] => nodata_value = nodata.parse::<f32>()?,
+                ["cellsize", cellsize]=> cell_size = cellsize.parse::<f32>()?,
             _ => {}
             }
         } else {
@@ -51,7 +53,7 @@ fn asc_to_image(content: String) -> Result<(Vec<f32>, u32, u32), Box<dyn Error>>
             }
         }
     }
-    Ok((data_elevation, width, height))
+    Ok((data_elevation, width, height,cell_size))
 }
 
 /// Converts elevation data into a grayscale image.
@@ -91,7 +93,7 @@ fn rgb(data_processed: Vec<f32>, width: u32, height: u32) -> RgbaImage {
 }
 
 /// Generates hillshade images (grayscale and RGB) from elevation data.
-fn hill_shading(data: &Vec<f32>, colored_image:RgbaImage, width: u32, height: u32, azimuth: f32, altitude: f32) -> (GrayImage, RgbaImage) {
+fn hill_shading(data: &Vec<f32>, colored_image:RgbaImage, width: u32, height: u32, cellsize: f32, azimuth: f32, altitude: f32) -> (GrayImage, RgbaImage) {
     let mut shaded_image = GrayImage::new(width, height);
     let mut shaded_image_rgb = RgbaImage::new(width, height);
     let radians = std::f32::consts::PI / 180.0;
@@ -112,8 +114,8 @@ fn hill_shading(data: &Vec<f32>, colored_image:RgbaImage, width: u32, height: u3
             let z8 = data[idx(0, 1)];
             let z9 = data[idx(1, 1)];
 
-            let dz_dx = (z3 + 2.0 * z6 + z9) - (z1 + 2.0 * z4 + z7);
-            let dz_dy = (z7 + 2.0 * z8 + z9) - (z1 + 2.0 * z2 + z3);
+            let dz_dx = ((z3 + 2.0 * z6 + z9) - (z1 + 2.0 * z4 + z7)) / (8.0 * cellsize);
+            let dz_dy = ((z7 + 2.0 * z8 + z9) - (z1 + 2.0 * z2 + z3)) / (8.0 * cellsize);
 
             let slope = (dz_dx.powi(2) + dz_dy.powi(2)).sqrt().atan();
             let aspect = dz_dy.atan2(dz_dx);
@@ -152,7 +154,7 @@ fn main(){
     let file_content = read_file(&args[1]);
     
     // use the asc_to_image function to open the file
-    let (data_elevation, width, height) = asc_to_image(file_content).expect("Failed to read ASC file"); 
+    let (data_elevation, width, height, cellsize) = asc_to_image(file_content).expect("Failed to read ASC file"); 
     println!("Width: {:?}", width);
     println!("Height: {:?}", height);
     
@@ -174,7 +176,7 @@ fn main(){
 print!("Image saved as output_rgb.png\n");
 
 // create a hillshade image 
-let (hillshade_gray, hillshade_rgb) = hill_shading(&data_elevation, img_rgb.clone(), width, height, 315.0, 45.0);
+let (hillshade_gray, hillshade_rgb) = hill_shading(&data_elevation, img_rgb.clone(), width, height, cellsize,315.0, 45.0);
 
 //  save the hillshade images
 DynamicImage::ImageLuma8(hillshade_gray)
@@ -218,7 +220,7 @@ mod tests {
         let content = "ncols 5\nnrows 2\nxllcorner 0\nyllcorner 0\ncellsize 1\nnodata_value -9999\n1 2 3 4 5\n6 7 8 9 10\n";
         let result = asc_to_image(content.to_string());
         assert!(result.is_ok());
-        let (data, width, height) = result.unwrap();
+        let (data, width, height, cellsize) = result.unwrap();
         assert_eq!(width, 5);
         assert_eq!(height, 2);
         assert_eq!(data.len(), 10);
@@ -230,7 +232,7 @@ mod tests {
         let content = "ncols 3\nnrows 2\nxllcorner 0\nyllcorner 0\ncellsize 1\nnodata_value -9999\n1 2 -9999\n-9999 5 6\n";
         let result = asc_to_image(content.to_string());
         assert!(result.is_ok());
-        let (data, width, height) = result.unwrap();
+        let (data, width, height, cellsize) = result.unwrap();
         assert_eq!(width, 3);
         assert_eq!(height, 2);
         assert_eq!(data.len(), 6);
@@ -320,8 +322,9 @@ mod tests {
         ];
         let width = 3;
         let height = 3;
+        let cellsize = 1.0;
         let colored_image = RgbaImage::new(width, height); // Dummy colored image
-        let (shaded_gray, shaded_rgb) = hill_shading(&data, colored_image, width, height, 315.0, 45.0);
+        let (shaded_gray, shaded_rgb) = hill_shading(&data, colored_image, width, height, cellsize, 315.0, 45.0);
         assert_eq!(shaded_gray.width(), width);
         assert_eq!(shaded_gray.height(), height);
         assert_eq!(shaded_rgb.width(), width);
@@ -339,8 +342,9 @@ mod tests {
         ];
         let width = 3;
         let height = 3;
+        let cellsize = 1.0;
         let colored_image = RgbaImage::new(width, height); // Dummy colored image
-        let (shaded_gray, shaded_rgb) = hill_shading(&data, colored_image, width, height, 315.0, 45.0);
+        let (shaded_gray, shaded_rgb) = hill_shading(&data, colored_image, width, height, cellsize, 315.0, 45.0);
         assert_eq!(shaded_gray.width(), width);
         assert_eq!(shaded_gray.height(), height);
         assert_eq!(shaded_rgb.width(), width);
@@ -358,8 +362,9 @@ mod tests {
         ];
         let width = 2;
         let height = 2;
+        let cellsize = 1.0;
         let colored_image = RgbaImage::new(width, height);
-        let (shaded_gray, shaded_rgb) = hill_shading(&data, colored_image, width, height, 315.0, 45.0);
+        let (shaded_gray, shaded_rgb) = hill_shading(&data, colored_image, width, height,cellsize, 315.0, 45.0);
         assert_eq!(shaded_gray.width(), width);
         assert_eq!(shaded_gray.height(), height);
         assert_eq!(shaded_rgb.width(), width);
