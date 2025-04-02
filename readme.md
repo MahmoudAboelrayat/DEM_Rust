@@ -33,7 +33,7 @@ This image represents the **gradient field**, highlighting the highest and lowes
 
 
 ## Dependencies
-This project relies on several Rust libraries:
+This project relies on several Rust Crates:
 - `image` - For image processing and saving outputs.
 - `colorgrad` - For applying color gradients.
 - `chrono` - For timestamping output files.
@@ -51,7 +51,8 @@ This project relies on several Rust libraries:
    ```sh
    cargo build 
    ```
-4. Download the dataset
+4. Download the dataset:
+   [Dataset](https://diffusion.shom.fr/multiproduct/product/configure/id/136)
 
 ## Usage
 Run the program by providing an ASC file path:
@@ -67,6 +68,7 @@ If no path is provided, the program uses a default ASC file with the location as
 - `output_rgb_YYYYMMDD_HHMMSS_turbo.png` - RGB elevation image
 - `hillshade_gray_YYYYMMDD_HHMMSS.png` - Grayscale hillshade
 - `hillshade_rgb_YYYYMMDD_HHMMSS.png` - RGB hillshade
+- `hillshade_rgb_gradient_YYYYMMDD_HHMMSS.png` - RGB hillshade with Gradient field
 
 All output images are saved in the `src/output_img` directory.
 
