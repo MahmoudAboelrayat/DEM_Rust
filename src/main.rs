@@ -142,19 +142,22 @@ fn hill_shading(data: &Vec<f32>, colored_image:RgbaImage, width: u32, height: u3
 }
 
 
-fn main(){
-    
+fn main() {
+    let output_path = "src/output_img";
+    let mut file_path = "0925_6225/LITTO3D_FRA_0925_6225_20150529_LAMB93_RGF93_IGN69/MNT1m/LITTO3D_FRA_0925_6225_MNT_20150529_LAMB93_RGF93_IGN69.asc";
     let args: Vec<String> = std::env::args().collect();
-    
     if args.len() < 2 {
-        eprintln!("Usage: {} <path_to_image>", args[0]);
-        std::process::exit(1);
+        println!("No file path provided. Using default:");
+        // std::process::exit(1);
     }
-    println!("Reading file path: {}", args[1]);
-    let file_content = read_file(&args[1]);
-    
+    else{
+        println!("Reading file path: {}", args[1]);
+        file_path = args[1].as_str();
+    }
+    let file_content = read_file(file_path);
+
     // use the asc_to_image function to open the file
-    let (data_elevation, width, height, cellsize) = asc_to_image(file_content).expect("Failed to read ASC file"); 
+    let (data_elevation, width, height,cell_size) = asc_to_image(file_content).expect("Failed to read ASC file"); 
     println!("Width: {:?}", width);
     println!("Height: {:?}", height);
     
@@ -162,36 +165,36 @@ fn main(){
     
     // Generate grayscale image
     let image_gray = data_to_grayscale(data_elevation.clone(), width, height);
-    let filename_gray = format!("output_img/output_{}.png", timestamp);
+    let filename_gray = format!("{}/output_{}.png", output_path,timestamp);
     image_gray.save(&filename_gray).expect("Failed to save image");
     print!("Image saved as output.png\n");
     
-    
+
     // Generate RGB image
     let img_rgb = rgb(data_elevation.clone(), width, height);
     
     DynamicImage::ImageRgba8(img_rgb.clone())
-    .save( format!("output_img/output_rgb_{}_turbo.png", timestamp))
-    .expect("Failed to save image");
-print!("Image saved as output_rgb.png\n");
+        .save( format!("{}/output_rgb_{}_turbo.png", output_path,timestamp))
+        .expect("Failed to save image");
+    print!("Image saved as output_rgb.png\n");
 
-// create a hillshade image 
-let (hillshade_gray, hillshade_rgb) = hill_shading(&data_elevation, img_rgb.clone(), width, height, cellsize,315.0, 45.0);
-
-//  save the hillshade images
-DynamicImage::ImageLuma8(hillshade_gray)
-.save(format!("output_img/hillshade_gray_{}.png", timestamp))
-.expect("Failed to save image");
-print!("Hillshade image saved as hillshade_gray.png\n");
-
-// save the hillshade image in RGB
-DynamicImage::ImageRgba8(hillshade_rgb.clone())
-.save(format!("output_img/hillshade_rgb_{}.png", timestamp))
-.expect("Failed to save image");
-print!("Hillshade image saved as hillshade_rgb.png\n");
-
+    // create a hillshade image 
+    let (hillshade_gray, hillshade_rgb) = hill_shading(&data_elevation, img_rgb, width, height,cell_size,315.0, 45.0);
+    
+    //  save the hillshade images
+    DynamicImage::ImageLuma8(hillshade_gray)
+        .save(format!("{}/hillshade_gray_{}.png",output_path, timestamp))
+        .expect("Failed to save image");
+    print!("Hillshade image saved as hillshade_gray.png\n");
+    
+    // save the hillshade image in RGB
+    DynamicImage::ImageRgba8(hillshade_rgb)
+        .save(format!("{}/hillshade_rgb_{}.png",output_path, timestamp))
+        .expect("Failed to save image");
+    print!("Hillshade image saved as hillshade_rgb.png\n");
 
 }
+
 
 #[cfg(test)]
 mod tests {
