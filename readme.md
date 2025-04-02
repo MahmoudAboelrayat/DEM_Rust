@@ -3,6 +3,10 @@
 ## Overview
 This Rust project processes elevation data from ASC files, converts it into grayscale and RGB images, and generates hillshade visualizations. The tool provides functionalities to read ASC files, extract elevation data, normalize it, and apply grayscale or color gradients for visualization.
 
+## Developers 
+- Mahmoud Tarek Aboelrayat
+- Youssief Morsy
+
 ## Features
 - **Reads ASC elevation files**: Extracts elevation data and metadata.
 - **Converts elevation data to images**:
