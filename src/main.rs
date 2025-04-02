@@ -1,10 +1,12 @@
-use std::{fs::File};
+use std::fs::File;
 use std::error::Error;
 use colorgrad::{Gradient, preset};
 use image::{DynamicImage, Luma, Rgba, RgbaImage, GrayImage};
 use anyhow::Result;
 use std::io::Read;
 use chrono::Local;
+use imageproc::drawing::draw_line_segment_mut;
+use std::f32::consts::PI;
 
 /// Reads the content of a file and returns it as a string.
 fn read_file(file_path: &str) -> String {
@@ -141,10 +143,86 @@ fn hill_shading(data: &Vec<f32>, colored_image:RgbaImage, width: u32, height: u3
     (shaded_image, shaded_image_rgb)
 }
 
+fn draw_vector_field(image: &mut RgbaImage, gradients: &Vec<(f32, f32)>, width: u32, height: u32) {
+    let arrow_color = Rgba([255, 255, 255, 255]); // Red color
+    let step = 30;  // ⬆ Increase spacing (fewer arrows)
+    let arrow_length = step as f32 * 0.8; // ⬆ Make arrows bigger
+    let arrowhead_size = step as f32 * 0.5; // ⬆ Increase arrowhead size
+
+    for y in (0..height).step_by(step) {
+        for x in (0..width).step_by(step) {
+            let idx = (y * width + x) as usize;
+
+            let (dx, dy) = gradients[idx];
+            let norm = (dx.powi(2) + dy.powi(2)).sqrt();
+
+            if norm > 0.0 {
+                let scale = arrow_length / norm; // Normalize arrow size
+                let end_x = x as f32 + scale * dx;
+                let end_y = y as f32 + scale * dy;
+
+                // Draw the main arrow line
+                draw_line_segment_mut(image, (x as f32, y as f32), (end_x, end_y), arrow_color);
+
+                // Compute arrowhead directions (-30° and +30°)
+                let angle = dy.atan2(dx); // Compute direction
+                let left_angle = angle + (PI / 6.0);  // +30°
+                let right_angle = angle - (PI / 6.0); // -30°
+
+                let left_x = end_x - arrowhead_size * left_angle.cos();
+                let left_y = end_y - arrowhead_size * left_angle.sin();
+                let right_x = end_x - arrowhead_size * right_angle.cos();
+                let right_y = end_y - arrowhead_size * right_angle.sin();
+
+                // Draw the arrowhead lines
+                draw_line_segment_mut(image, (end_x, end_y), (left_x, left_y), arrow_color);
+                draw_line_segment_mut(image, (end_x, end_y), (right_x, right_y), arrow_color);
+            }
+        }
+    }
+}
+fn compute_gradients(data: &Vec<f32>, width: u32, height: u32, window_size: u32) -> Vec<(f32, f32)> {
+    let mut gradients = vec![(0.0, 0.0); (width * height) as usize];
+    
+    // Ensure window_size is odd for symmetry
+    let half_window = window_size / 2;
+    
+    for y in half_window..(height - half_window) {
+        for x in half_window..(width - half_window) {
+            let idx = (y * width + x) as usize;
+            
+            // Compute dz/dx using the specified window size
+            let mut dz_dx = 0.0;
+            for offset in 1..=half_window as i32 {
+                // Positive contribution from left points
+                dz_dx += data[(y * width + (x as i32 - offset) as u32) as usize];
+                // Negative contribution from right points
+                dz_dx -= data[(y * width + (x as i32 + offset) as u32) as usize];
+            }
+            dz_dx /= half_window as f32;
+            
+            // Compute dz/dy using the specified window size
+            let mut dz_dy = 0.0;
+            for offset in 1..=half_window as i32 {
+                // Positive contribution from top points
+                dz_dy += data[((y as i32 - offset) as u32 * width + x) as usize];
+                // Negative contribution from bottom points
+                dz_dy -= data[((y as i32 + offset) as u32 * width + x) as usize];
+            }
+            dz_dy /= half_window as f32;
+            
+            gradients[idx] = (dz_dx, dz_dy);
+        }
+    }
+    
+    gradients
+}
+
+
 
 fn main() {
     let output_path = "src/output_img";
-    let mut file_path = "0925_6225/LITTO3D_FRA_0925_6225_20150529_LAMB93_RGF93_IGN69/MNT1m/LITTO3D_FRA_0925_6225_MNT_20150529_LAMB93_RGF93_IGN69.asc";
+    let mut file_path = "/home/anas/Downloads/0925_6225/LITTO3D_FRA_0925_6225_20150529_LAMB93_RGF93_IGN69/MNT1m/LITTO3D_FRA_0925_6225_MNT_20150529_LAMB93_RGF93_IGN69.asc";
     let args: Vec<String> = std::env::args().collect();
     if args.len() < 2 {
         println!("No file path provided. Using default:");
@@ -179,7 +257,7 @@ fn main() {
     print!("Image saved as output_rgb.png\n");
 
     // create a hillshade image 
-    let (hillshade_gray, hillshade_rgb) = hill_shading(&data_elevation, img_rgb, width, height,cell_size,315.0, 45.0);
+    let (hillshade_gray, hillshade_rgb) = hill_shading(&data_elevation, img_rgb.clone(), width, height,cell_size,315.0, 45.0);
     
     //  save the hillshade images
     DynamicImage::ImageLuma8(hillshade_gray)
@@ -188,16 +266,27 @@ fn main() {
     print!("Hillshade image saved as hillshade_gray.png\n");
     
     // save the hillshade image in RGB
-    DynamicImage::ImageRgba8(hillshade_rgb)
+    DynamicImage::ImageRgba8(hillshade_rgb.clone())
         .save(format!("{}/hillshade_rgb_{}.png",output_path, timestamp))
         .expect("Failed to save image");
     print!("Hillshade image saved as hillshade_rgb.png\n");
+
+    let mut grad_img = hillshade_rgb.clone();
+    let gradients = compute_gradients(&data_elevation.clone(), width, height,61);
+    draw_vector_field(&mut grad_img, &gradients, width, height);
+    
+    DynamicImage::ImageRgba8(grad_img)
+    .save(format!("{}/hillshade_grasssd_img_{}.png",output_path, timestamp))
+    .expect("Failed to save image");
+    print!("Hillshade image saved as hillshade_grad_img.png\n");
 
 }
 
 
 #[cfg(test)]
 mod tests {
+    use imageproc::gradients;
+
     use super::*;
     use std::fs;
     // use std::io::{BufReader, BufRead};
