@@ -29,7 +29,7 @@ This image represents the **final hillshade RGB representation** using a color g
 ### Gradient Field Representation
 This image represents the **gradient field**, highlighting the highest and lowest elevation regions.
 
-![RGB Hillshade](src/output_img/hillshade_grasssd_img_20250402_171225.png)
+![RGB Hillshade](src/output_img/hillshade_rgb_gradient_20250402_171225.png)
 
 
 ## Dependencies
